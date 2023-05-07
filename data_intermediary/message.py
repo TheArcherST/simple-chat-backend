@@ -4,7 +4,9 @@ from typing import Optional
 from dataclasses import dataclass
 from datetime import datetime
 
-from database import models
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from database import models, crud
 from schemas.v1 import message as schemas
 
 from .base import BaseDataIntermediary
@@ -21,7 +23,7 @@ class MessageDataIntermediary(BaseDataIntermediary):
     deleted_at: Optional[datetime]
 
     @classmethod
-    def from_model(cls, obj: models.Message) -> Self:
+    async def from_model(cls, obj: models.Message) -> Self:
         return cls(
             id=obj.id,
             from_user_id=obj.from_user_id,
@@ -32,10 +34,15 @@ class MessageDataIntermediary(BaseDataIntermediary):
             deleted_at=obj.deleted_at,
         )
 
-    def to_schema(self) -> schemas.Message:
+    async def to_schema(self, session: AsyncSession) -> schemas.Message:
+        user = await crud.user.get_user_by_id(
+            session=session,
+            user_id=self.from_user_id
+        )
+
         return schemas.Message(
             id=self.id,
-            from_user_id=self.from_user_id,
-            chat_id=self.chat_id,
+            from_user=user.username,
+            chat=user.username,
             text=self.text,
         )

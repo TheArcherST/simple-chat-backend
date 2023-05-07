@@ -3,8 +3,8 @@ from pydantic import BaseModel
 
 class Message(BaseModel):
     id: int
-    from_user_id: int
-    chat_id: int
+    from_user: str
+    chat: str
     text: str
 
 

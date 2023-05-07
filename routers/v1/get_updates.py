@@ -32,6 +32,6 @@ async def get_updates(
         message_ids=message_ids,
     )
 
-    results = MessageDataIntermediary.models_to_schemas(results)
+    results = await MessageDataIntermediary.models_to_schemas(session, results)
 
     return results
